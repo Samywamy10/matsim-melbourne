@@ -1,4 +1,4 @@
-# Data-Latch directory
+# Data-shp directory
 
 * [About this directory](#about-this-directory)
 * [Files Contained](#files-contained)
