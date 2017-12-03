@@ -7,6 +7,8 @@
 
 ## About this directory
 
+* Contains Open Street Map implementation files
+
 ## Files contained
 
 The following list describes the files contained in the directory
@@ -17,6 +19,6 @@ The following list describes the files contained in the directory
 ## Contributors
 
 * Dhirendra Singh, RMIT University
-
+* Karthikey Surineni, RMIT University
 
 
