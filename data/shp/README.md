@@ -1,4 +1,4 @@
-# Data-shp directory
+# SHP directory
 
 * [About this directory](#about-this-directory)
 * [Files Contained](#files-contained)
