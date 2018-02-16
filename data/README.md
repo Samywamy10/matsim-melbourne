@@ -8,22 +8,58 @@ Contains data coming from the census, or derived (such as the so-called "latch" 
   * Saved in `census/2006/`  
 
 * 2011 Census correspondence data
+  * Correspondence information for SA1 codes to statistical area and state codes and names in Australia(viz. SA2, SA3,
+    SA4, Greater Capital States and Areas (GCSA), States)
   * URL: http://www.abs.gov.au/ausstats/subscriber.nsf/log?openagent&1270055001_sa1_2011_aust_csv.zip&1270.0.55.001&Data%20Cubes&5AD36D669F284E70CA257801000C69BE&0&July%202011&23.12.2010&Latest
   * Last accessed: January 2018
   * Saved in `census/2011/`
 
 * 2011 Census latch data
-  * Synthetic population and household files generated on 30-11-2017
-    * AllAgents - Population personal characteristics
-	* AllFamilies - Population family members and associated household
-	* AllHouseholds - Household region and associated families and members
-	* Hh-mapped-address - Household features and location data
-  * Last accessed: January 2018
+  * 2017-11-30-files-from-bhagya
+   * Synthetic population and household files generated on 30-11-2017
+     * AllAgents - Population personal characteristics
+	 * AllFamilies - Population family members and associated household
+	 * AllHouseholds - Household region and associated families and members
+	 * Hh-mapped-address - Household features and location data
+
+  * 2018-02-01-files-from-bhagya
+   * Synthetic population and household files generated on 30-11-2017
+     * AllAgents - Population personal characteristics
+	 * AllFamilies - Population family members and associated household
+	 * AllHouseholds - Household region and associated families and members
+	 * Hh-mapped-address - Household features and location data
+	 * BuildingsCumSA1andDwellingProperties.json.gz -
+  * Last accessed: February 2018
   * Saved in `census/2011/`
 
 * 2011 Census mtwp data
+  * 2017-11-24-Victoria
+    * UR and POW by MTWP.csv - Used by the java file - 'AddWorkPlacesToPopulation' to decide the number of trips from an
+      SA2 residence to SA2 workplace (categorised by transport mode). The file doesn't categorise people based on their
+      characteristics.
 
-  * Last accessed: January 2018
+  * 2018-01-15-Victoria
+    * Victoria_SA2_UR_by_SA2_POW.csv - This files is un-used. There was a deliberation to use the file below for
+      extracting the destination and transport mode trips but the file remains un-used (consider deleting).
+
+  * 2018-02-16-mtwp-files
+    * The files under this directory contain journey-to-work information for a specific SA2 usual residence location.
+      The information is grouped by person characteristics (i.e gender(M/F), age-range(15-24,25-39,40-54,55-69,70-84,
+      85-99, 100 years and above), Relationship Status (Lone Parent, Group house hold, Lone Person, Married, Over 15
+      Child, Relative, Student, Under 15 Child), LFSP Labour Force Status, Main Statistical Area Structure (Main ASGS)
+      Place of Work (POW), MTWP Method of travel to Work.
+
+      ``NOTE - For more information regarding the type of individuals used in creating the above categorical groupings
+        refer to the file `data\census\2011\mtwp\2018-02-16-mtwp-files\Custom Individual Relationship Categories.pdf` ``
+
+  * Last accessed: February 2018
+  * Saved in `census/2011/`
+
+* 2011 Census population file
+  * VIC - SEXP_AGE5P_LFSP_UR_2011.csv - File used to estimate the part-time and full-time workforce numbers for SA2
+    usual residence locations in Victoria. These numbers are used to decide the proportion of working people to be
+    assigned destination and transport mode trips
+  * Last accessed: February 2018
   * Saved in `census/2011/`
 
 * 2011 Census shape file data
