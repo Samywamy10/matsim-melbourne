@@ -1,0 +1,18 @@
+2018-03-03 22:56:45,995  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 47.95084518265632 to 59.938556478320415
+2018-03-03 22:56:45,997  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 24.71287139233363 to 30.891089240417035
+2018-03-03 22:56:45,998  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 9.548311809987187 to 11.935389762483982
+2018-03-03 22:56:45,999  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 179.49698298427276 to 224.371228730341
+2018-03-03 22:56:46,001  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 5.357130889153621 to 6.6964136114420265
+2018-03-03 22:56:46,002  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 79.21309128810584 to 94.06554590462568
+2018-03-03 22:56:46,003  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 101.97218572532229 to 121.09197054882021
+2018-03-03 22:56:46,003  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 52.68835576273614 to 62.56742246824918
+2018-03-03 22:56:46,006  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 139.14416062784917 to 173.9302007848115
+2018-03-03 22:56:46,007  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 76.09253500234176 to 95.11566875292719
+2018-03-03 22:56:46,007  WARN QueueWithBuffer:367 storage capacity not sufficient for holes; increasing from 3.699604631112886 to 4.492377052065647
+2018-03-03 22:56:55,405  WARN CharyparNagelActivityScoring:252 The first and the last activity do not have the same type. 
+2018-03-03 22:56:55,405  WARN CharyparNagelActivityScoring:253 Will score the first activity from midnight to its end, and the last activity from its start to midnight.
+2018-03-03 22:56:55,405  WARN CharyparNagelActivityScoring:254 Because of the nonlinear function, this is not the same as scoring from start to end.
+2018-03-03 22:56:55,405  WARN CharyparNagelActivityScoring:255 first activity: [type=At Home][coord=null][linkId=c122028-c122029][startTime=undefined][endTime=07:23:00][duration=undefined][facilityId=null]
+2018-03-03 22:56:55,406  WARN CharyparNagelActivityScoring:256 last activity: [type=home][coord=null][linkId=c122028-c122029][startTime=17:04:59][endTime=undefined][duration=undefined][facilityId=null]
+2018-03-03 22:56:55,406  WARN CharyparNagelActivityScoring:257 This may also happen when plans are not completed when the simulation ends.
+2018-03-03 22:56:55,406  WARN CharyparNagelActivityScoring:259 Additional warnings of this type are suppressed.

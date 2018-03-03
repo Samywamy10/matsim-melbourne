@@ -1,0 +1,10 @@
+pattern	0+	5+	10+	15+	20+	25+	30+	35+	40+	45+	50+	55+	60+
+At Home---car interaction	2152	897	51	39	11	0	0	0	0	0	0	0	0
+At Home---work	758	2147	44	0	6	0	0	0	0	0	0	0	0
+car interaction---car interaction	1483	2041	1181	497	311	129	96	88	75	75	67	40	217
+car interaction---home	2152	897	51	39	11	0	0	0	0	0	0	0	0
+car interaction---work	2333	630	115	48	13	8	0	1	0	1	1	0	0
+work---car interaction	2333	630	115	48	13	8	0	1	0	1	1	0	0
+work---home	758	2147	44	0	6	0	0	0	0	0	0	0	0
+
+average trip duration: 412.32595727529224 seconds = 00:06:52
