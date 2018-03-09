@@ -8,8 +8,7 @@ The database - `2011 Census - Counting of Employed Persons, Place of Work`  has 
 details about the working population and the place they work. 
 
 For a general introduction about this database, please refer to [2011 Census - Counting of Employed Persons, Place of
- Work - Introduction]:(http://www.abs.gov.au/ausstats/abs@
-.nsf/Previousproducts/2901.0Main%20Features12011?opendocument&tabname=Summary&prodno=2901.0&issue=2011&num=&view=)
+ Work - Introduction](<http://www.abs.gov.au/ausstats/abs@.nsf/Previousproducts/2901.0Main%20Features12011?opendocument&tabname=Summary&prodno=2901.0&issue=2011&num=&view=>)
 
 ## About the Fields
 Each file contains details about the journey-work trips for people based on certain characteristics, belonging to a 
@@ -59,7 +58,7 @@ Custom age-ranges are used and are listed below:
 
 #### Relationships (RLHP Relationship in Household)
 The Relationships and custom groupings using them are covered under `RLHP Relationship in Household` 
-are described in the document [Custom Relationship Categories]:(../data/census/2011/mtwp/2018-02-16-mtwp-files/Custom Individual Relationship Categories.pdf)                     
+are described in the document [Custom Relationship Categories](../data/census/2011/mtwp/2018-02-16-mtwp-files/Custom Individual Relationship Categories.pdf)                     
 
 #### Employment Status (LFSP Labour Force Status)
 The employment status categories used, include:
