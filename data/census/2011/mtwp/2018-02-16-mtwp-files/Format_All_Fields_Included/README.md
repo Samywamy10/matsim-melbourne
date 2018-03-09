@@ -58,7 +58,7 @@ Custom age-ranges are used and are listed below:
 
 #### Relationships (RLHP Relationship in Household)
 The Relationships and custom groupings using them are covered under `RLHP Relationship in Household` 
-are described in the document [Custom Relationship Categories](../Custom Individual Relationship Categories.pdf)                     
+are described in the document [Custom Relationship Categories](<../Custom Individual Relationship Categories.pdf>)                     
 
 #### Employment Status (LFSP Labour Force Status)
 The employment status categories used, include:
