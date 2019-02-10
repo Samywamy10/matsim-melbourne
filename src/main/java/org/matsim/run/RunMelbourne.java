@@ -29,6 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -37,7 +38,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
-
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 /**
  * @author nagel
  *
@@ -50,11 +52,20 @@ public class RunMelbourne {
 		
 		Config config = prepareConfig(args);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		Scenario scenario = prepareScenario(config);
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;
+		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.teleport ) ;
 
-		Controler controler = prepareControler(scenario);
+		Scenario scenario = prepareScenario(config);
+		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+		visConfig.setDrawTime(true);
+		visConfig.setDrawNonMovingItems(true);
+		visConfig.setAgentSize(125);
+		visConfig.setLinkWidth(10);
+		visConfig.setDrawTransitFacilityIds(false);
+		visConfig.setDrawTransitFacilities(false);
 		
+		Controler controler = prepareControler(scenario);
+		//controler.addOverridingModule( new OTFVisLiveModule() );
 		controler.run();
 	}
 	

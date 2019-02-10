@@ -21,10 +21,10 @@ printf "\nExtracting PBF from archive...\n\n"
 tar -jxvf tmp.tar.bz2
 
 # Mount Alexander Shire bounding box
-top=-36.7323
-left=144.0294
-bottom=-37.2686
-right=144.4888
+top=-37.81393
+left=144.94140
+bottom=-37.82480
+right=144.96511
 
 printf "\nExtracting Mount Alexander Shire region (bounding box [$top,$right $bottom,$left]) ... \n\n"
 osmosis  --read-pbf file=AU  \

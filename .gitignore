@@ -37,3 +37,5 @@ hs_err_pid*
 plansCoM.xml.gz
 population-from-latch.xml
 **/output
+
+\.vscode/

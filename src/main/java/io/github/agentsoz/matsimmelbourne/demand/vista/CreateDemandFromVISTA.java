@@ -115,7 +115,7 @@ final class CreateDemandFromVISTA {
 
 	public void run() throws IOException {
 		this.createPUSPersons();// create all the people and add a plan to each
-		this.createPUSPlans();// create the plans according to the trip files (pusTripsFile)
+		//this.createPUSPlans();// create the plans according to the trip files (pusTripsFile)
 		//		this.matchFirstAndLastAct();// add a trip to the end or beginning of the plan to match the first and last activity to have a tour based plan
 		//		this.matchHomeCoord(); //since in adding the activities the coordinates have been randomised in for each destination, agents have different home locations, this method is need to set all the home location to a single one. 
 		this.populationWriting();
