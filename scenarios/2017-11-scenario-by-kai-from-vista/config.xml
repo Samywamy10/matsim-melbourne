@@ -5,20 +5,23 @@
 	<!-- ====================================================================== -->
 	<module name="network" >
 		<param name="inputNetworkFile" value="net2.xml" />
+		<param name="timeVariantNetwork" value="true" />
+		<param name="inputChangeEventsFile" value="networkChangeEvents.xml" />
 	</module>
 	<!-- ====================================================================== -->
 	<module name="plans" >
-		<param name="inputPlansFile" value="sampleplans.xml" />
+		<param name="inputPlansFile" value="sampleplansgenerated.xml" />
 	</module>
 	<!-- ====================================================================== -->
 	<module name="qsim" >
-		<param name="flowCapacityFactor" value="0.1" />
-		<param name="storageCapacityFactor" value="0.1" />
+		<param name="flowCapacityFactor" value="0.2" />
+		<param name="storageCapacityFactor" value="0.2" />
+		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="10:00:00" />
 	</module>
 	<!-- ====================================================================== -->
 	<module name="controler" >
-		<param name="lastIteration" value="500" />
+		<param name="lastIteration" value="10" /> <!--anything less than 10 causes errors? -->
 	</module>
 	<!-- ====================================================================== -->
 	<module name="strategy">
@@ -60,6 +63,8 @@
 			<parameterset type="activityParams" >
 				<param name="activityType" value="car interaction" />
 				<param name="scoringThisActivityAtAll" value="false" />
+				<param name="openingTime" value="00:00:00" />
+				<param name="closingTime" value="03:00:00" />
 			</parameterset>
 
 			<parameterset type="activityParams" >
@@ -115,6 +120,8 @@
 				<param name="activityType" value="Go Home" />
 				<param name="typicalDuration" value="36000" />
 				<param name="typicalDurationScoreComputation" value="relative" />
+				<param name="openingTime" value="00:00:00" />
+				<param name="closingTime" value="03:00:00" />
 			</parameterset>
 
 			<parameterset type="activityParams" >

@@ -6,4 +6,4 @@ ENTRYPOINT mvn -f "pom.xml" clean package -e -DskipTests
 
 # docker build . -t evacuation
 # docker run --name evacuationApp -d evacuation 
-# docker cp evacuationApp:/app/target build
+# docker cp evacuationApp:/app/target dockeroutput

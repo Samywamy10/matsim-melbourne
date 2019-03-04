@@ -1,12 +1,13 @@
 import sys
 
 number_of_plans = int(sys.argv[1])
-
+from dateutil import parser
+from datetime import timedelta
 import xml.etree.ElementTree as ET
 import math
 import random
-tree = ET.parse('net2.xml')
-root = tree.getroot()
+network = ET.parse('net2.xml')
+root = network.getroot()
 min_x = math.inf
 min_y = math.inf
 max_x = -math.inf
@@ -69,7 +70,67 @@ for person in range(number_of_plans):
     end_activity.set('type','Go Home')
     end_activity.set('x',str(end_x))
     end_activity.set('y',str(end_y))
+    end_activity.set('start_time', '00:00:00')
     end_activity.set('end_time', '03:00:00')
 
 tree = ET.ElementTree(population)
-tree.write("sampleplansgenerated.xml")
+header1 = '<?xml version="1.0" encoding="utf-8"?>'
+header2 = '<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">'
+
+filename = "sampleplansgenerated.xml"
+
+tree.write(filename)
+
+with open(filename, 'r+') as f:
+    content = f.read()
+    f.seek(0, 0)
+    f.write(header1 + '\n' + header2 + '\n')
+    f.write(content)
+
+networkChangeEvents = ET.Element('networkChangeEvents')
+networkChangeEvents.set('xmlns','http://www.matsim.org/files/dtd')
+networkChangeEvents.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+networkChangeEvents.set('xsi:schemaLocation','http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd')
+
+
+#major flooding
+startTime = '01:00:01'
+def addToTime(currentTime, addSeconds):
+    currentTime = parser.parse(currentTime) + timedelta(seconds=addSeconds)
+    return currentTime.strftime("%H:%M:%S")
+
+current = 0
+with open("flooding.txt", 'r') as majorFloodingFile:
+    for line in majorFloodingFile:
+        if(line[0] == "#"):
+            if current != 0:
+                freespeed = ET.SubElement(networkChangeEvent,'freespeed')
+                freespeed.set('type','absolute')
+                freespeed.set('value','0.00000001') #value of 0 causes errors
+            networkChangeEvent = ET.SubElement(networkChangeEvents,'networkChangeEvent')
+            networkChangeEvent.set('startTime',startTime)
+            startTime = addToTime(startTime,30)
+            current += 1
+        else:
+            Id = line.strip()
+            link = ET.SubElement(networkChangeEvent,'link')
+            link.set('refId',Id)
+    freespeed = ET.SubElement(networkChangeEvent,'freespeed')
+    freespeed.set('type','absolute')
+    freespeed.set('value','0.00000001')
+
+
+
+
+
+
+networkChangeEventsFile = "networkChangeEvents.xml"
+
+
+networkChangeEventsTree = ET.ElementTree(networkChangeEvents)
+networkChangeEventsTree.write(networkChangeEventsFile)
+with open(networkChangeEventsFile, 'r+') as f:
+    content = f.read()
+    f.seek(0, 0)
+    f.write(header1 + '\n')
+    f.write(content)
