@@ -2,6 +2,9 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
+	<module name="global">
+		<param name="numberOfThreads" value="6" />
+	</module>
 	<!-- ====================================================================== -->
 	<module name="network" >
 		<param name="inputNetworkFile" value="net2.xml" />
@@ -14,6 +17,7 @@
 	</module>
 	<!-- ====================================================================== -->
 	<module name="qsim" >
+		<param name="numberOfThreads" value="6" />
 		<param name="flowCapacityFactor" value="0.2" />
 		<param name="storageCapacityFactor" value="0.2" />
 		<param name="startTime" value="00:00:00" />

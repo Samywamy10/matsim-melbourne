@@ -18,8 +18,13 @@ for child in root.iter('node'):
     max_x = max(float(child.attrib['x']),max_x)
     max_y = max(float(child.attrib['y']),max_y)
 
-population = ET.Element('population')
+margin_of_error = 200
+min_x += margin_of_error
+min_y += margin_of_error
+max_x -= margin_of_error
+max_y -= margin_of_error
 
+population = ET.Element('population')
 
 for person in range(number_of_plans):
     current_person = ET.SubElement(population,'person')
@@ -38,39 +43,20 @@ for person in range(number_of_plans):
     leg = ET.SubElement(current_plan, 'leg')
     leg.set('mode','car')
 
-    end_x = start_x
+    end_x = random.uniform(min_x, max_x)
     end_y = start_y
     #we want to move people to the nearest edge except for min x
-    x_dist = math.inf
-    x_param = "min"
-    if start_x - min_x > max_x - start_x: #closer to max x
-        x_dist = max_x - start_x
-        x_param = "max"
-    else: #closer to min_x
-        x_dist = start_x - min_x
+    if abs(start_y - max_y) > abs(start_y - min_y):
+        end_y = max_y
+    else:
+        end_y = min_y
 
-    if start_y - min_y > max_y - start_y: #closer to max y
-        if max_y - start_y > x_dist: #dist to y is greater than dist to x
-            if x_param == "min":
-                end_x = min_x
-            else:
-                end_x = max_x
-        else:
-            end_y = max_y
-    else: #closer to min_y
-        if start_y - min_y > x_dist: #dist to y is greater than dist to x
-            if x_param == "min":
-                end_x = min_x
-            else:
-                end_x = max_x
-        else:
-            end_y = min_y
         
     end_activity = ET.SubElement(current_plan, 'activity')
     end_activity.set('type','Go Home')
     end_activity.set('x',str(end_x))
     end_activity.set('y',str(end_y))
-    end_activity.set('start_time', '00:00:00')
+    end_activity.set('start_time', '01:0:00')
     end_activity.set('end_time', '03:00:00')
 
 tree = ET.ElementTree(population)
@@ -94,7 +80,7 @@ networkChangeEvents.set('xsi:schemaLocation','http://www.matsim.org/files/dtd ht
 
 
 #major flooding
-startTime = '01:00:01'
+startTime = '01:01:00'
 def addToTime(currentTime, addSeconds):
     currentTime = parser.parse(currentTime) + timedelta(seconds=addSeconds)
     return currentTime.strftime("%H:%M:%S")
