@@ -11,6 +11,10 @@ class Coordinate:
     def __init__(self,x,y):
         self.x = x
         self.y = y
+    
+    @staticmethod
+    def distanceBetweenPoints(coordinate1, coordinate2):
+        return math.sqrt((coordinate2.x - coordinate1.x)**2 + (coordinate2.y - coordinate1.y)**2)
 
 class Shape:
     def __init__(self):
@@ -20,19 +24,17 @@ class Shape:
     def getRandomPosition(self):
         return Coordinate(random.uniform(self.min.x, self.max.x), random.uniform(self.min.y, self.max.y))
 
-def getClosestRegion(startCoordinate, regions):
-    closestDistance = math.inf
-    closestDistanceRegion = regions[0]
-    for region in regions:
-        toMinPointDistance = distanceBetweenPoints(startCoordinate, region.min)
-        toMaxPointDistance = distanceBetweenPoints(startCoordinate, region.max)
-        if toMinPointDistance < closestDistance or toMaxPointDistance < closestDistance:
-            closestDistance = min(toMinPointDistance, toMaxPointDistance)
-            closestDistanceRegion = region
-    return closestDistanceRegion
-
-def distanceBetweenPoints(coordinate1, coordinate2):
-    return math.sqrt((coordinate2.x - coordinate1.x)**2 + (coordinate2.y - coordinate1.y)**2)
+    @staticmethod
+    def getClosestShapeFromCoordinate(startCoordinate, shapes):
+        closestDistance = math.inf
+        closestDistanceShape = shapes[0]
+        for shape in shapes:
+            toMinPointDistance = Coordinate.distanceBetweenPoints(startCoordinate, shape.min)
+            toMaxPointDistance = Coordinate.distanceBetweenPoints(startCoordinate, shape.max)
+            if toMinPointDistance < closestDistance or toMaxPointDistance < closestDistance:
+                closestDistance = min(toMinPointDistance, toMaxPointDistance)
+                closestDistanceShape = shape
+        return closestDistanceShape
 
 class Polygon(Shape):
     def __init__(self,topLeft,topRight,bottomLeft,bottomRight):
@@ -95,25 +97,35 @@ class XmlElement:
     def addSubElement(self, subElement):
         self.xmlElement.append(subElement)
 
+    def getTree(self):
+        return ET.ElementTree(self.xmlElement)
+
+    def writeTreeToFile(self, filename, header2 = ''):
+        tree = self.getTree()
+        header1 = '<?xml version="1.0" encoding="utf-8"?>'
+        tree.write(filename)
+        with open(filename, 'r+') as f:
+            content = f.read()
+            f.seek(0, 0)
+            f.write(header1 + '\n' + header2 + '\n')
+            f.write(content)
+
 class Population(XmlElement):
     def __init__(self):
         XmlElement.__init__(self,'population')
     
-    def generatePopulation(self, populationSize, startRegion, endRegions):
+    def generatePopulation(self, populationSize, startPolygon, endPolygons):
         for personNumber in range(populationSize):
             person = Person(personNumber, self.xmlElement)
             plan = Plan()
-            startCoordinate = startRegion.getRandomPosition()
+            startCoordinate = startPolygon.getRandomPosition()
             startActivity = Activity('At Home', startCoordinate, '01:00:00')
             plan.addActivity(startActivity)
             plan.addActivity(Leg('car'))
-            endActivity = Activity('Go Home', getClosestRegion(startCoordinate, endRegions).getRandomPosition(), '03:00:00')
+            endActivity = Activity('Go Home', Shape.getClosestShapeFromCoordinate(startCoordinate, endPolygons).getRandomPosition(), '03:00:00')
             plan.addActivity(endActivity)
             person.addPlan(plan)
             self.addPerson(person)
-
-    def getTree(self):
-        return ET.ElementTree(self.xmlElement)
 
     def addPerson(self, person):
         self.addSubElement(person.xmlElement)
@@ -158,80 +170,73 @@ class Leg(XmlElement):
         XmlElement.__init__(self, 'leg')
         self.xmlElement.set('mode',modeName)            
 
+class NetworkChangeEvents(XmlElement):
+    def __init__(self):
+        XmlElement.__init__(self, 'networkChangeEvents')
+        self.xmlElement.set('xmlns','http://www.matsim.org/files/dtd')
+        self.xmlElement.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+        self.xmlElement.set('xsi:schemaLocation','http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd')
+    
+    def addNetworkChangeEvent(self, networkChangeEvent):
+        self.addSubElement(networkChangeEvent.xmlElement)
+
+    @staticmethod
+    def addToTime(currentTime, addSeconds):
+        currentTime = parser.parse(currentTime) + timedelta(seconds=addSeconds)
+        return currentTime.strftime("%H:%M:%S")
+        
+    def generateNetworkChangeEvents(self, inputfile):
+        current = 0
+        startTime = '01:00:01'
+        with open(inputfile, 'r') as floodingFile:
+            for line in floodingFile:
+                if(line[0] == "#"):
+                    networkChangeEvent = NetworkChangeEvent(startTime)
+                    startTime = self.addToTime(startTime,1)
+                    if current != 0:
+                        freespeed = Freespeed()
+                        networkChangeEvent.addFreespeed(freespeed)
+                    self.addNetworkChangeEvent(networkChangeEvent)
+                    current += 1
+                else:
+                    id = line.strip()
+                    link = Link(id)
+                    networkChangeEvent.addLink(link)
+
+class NetworkChangeEvent(XmlElement):
+    def __init__(self, startTime = '01:00:01'):
+        XmlElement.__init__(self, 'networkChangeEvent')
+        self.xmlElement.set('startTime', startTime)
+    
+    def addFreespeed(self, freespeed):
+        self.addSubElement(freespeed.xmlElement)
+    
+    def addLink(self, link):
+        self.addSubElement(link.xmlElement)
+
+class Freespeed(XmlElement):
+    def __init__(self, speed = 0.000001):
+        XmlElement.__init__(self, 'freespeed')
+        self.xmlElement.set('type','absolute')
+        self.xmlElement.set('value',format(speed, 'f'))
+
+class Link(XmlElement):
+    def __init__(self, id):
+        XmlElement.__init__(self, 'link')
+        self.xmlElement.set('refId', id)
 
 
 #safe zone above creek
-above_creek = Polygon(Coordinate(1.614234761040829E7,-4560734.749976564), Coordinate(1.6143367207888365E7,-4560898.8048608275), Coordinate(1.6142285026590563E7, -4561169.767607265), Coordinate(1.614330436803581E7,-4561331.897382162))
+aboveCreek = Polygon(Coordinate(1.614234761040829E7,-4560734.749976564), Coordinate(1.6143367207888365E7,-4560898.8048608275), Coordinate(1.6142285026590563E7, -4561169.767607265), Coordinate(1.614330436803581E7,-4561331.897382162))
 
 #safe zone below creek
-below_creek = Polygon(Coordinate(1.6143313774532782E7,-4566525.3373900475), Coordinate(1.6144027621899443E7,-4566781.843705078), Coordinate(1.6143215668665543E7,-4567264.97602887),Coordinate(1.6143947816956492E7,-4567382.626620158))
-
-
-
+belowCreek = Polygon(Coordinate(1.6143313774532782E7,-4566525.3373900475), Coordinate(1.6144027621899443E7,-4566781.843705078), Coordinate(1.6143215668665543E7,-4567264.97602887),Coordinate(1.6143947816956492E7,-4567382.626620158))
 
 network = Network(ET.parse('net2.xml'))
 population = Population()
-population.generatePopulation(populationSize, network, [below_creek,above_creek])
+population.generatePopulation(populationSize, network, [belowCreek,aboveCreek])
+population.writeTreeToFile("generatedplans.xml", '<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">')
 
-
-tree = population.getTree()
-header1 = '<?xml version="1.0" encoding="utf-8"?>'
-header2 = '<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">'
-
-filename = "generatedplans.xml"
-
-tree.write(filename)
-
-with open(filename, 'r+') as f:
-    content = f.read()
-    f.seek(0, 0)
-    f.write(header1 + '\n' + header2 + '\n')
-    f.write(content)
-
-networkChangeEvents = ET.Element('networkChangeEvents')
-networkChangeEvents.set('xmlns','http://www.matsim.org/files/dtd')
-networkChangeEvents.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
-networkChangeEvents.set('xsi:schemaLocation','http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd')
-
-
-#major flooding
-startTime = '01:00:01'
-def addToTime(currentTime, addSeconds):
-    currentTime = parser.parse(currentTime) + timedelta(seconds=addSeconds)
-    return currentTime.strftime("%H:%M:%S")
-
-current = 0
-with open("flooding.txt", 'r') as majorFloodingFile:
-    for line in majorFloodingFile:
-        if(line[0] == "#"):
-            if current != 0:
-                freespeed = ET.SubElement(networkChangeEvent,'freespeed')
-                freespeed.set('type','absolute')
-                freespeed.set('value','0.00000001') #value of 0 causes errors
-            networkChangeEvent = ET.SubElement(networkChangeEvents,'networkChangeEvent')
-            networkChangeEvent.set('startTime',startTime)
-            startTime = addToTime(startTime,1)
-            current += 1
-        else:
-            Id = line.strip()
-            link = ET.SubElement(networkChangeEvent,'link')
-            link.set('refId',Id)
-    freespeed = ET.SubElement(networkChangeEvent,'freespeed')
-    freespeed.set('type','absolute')
-    freespeed.set('value','0.00000001')
-
-
-
-
-
-
-networkChangeEventsFile = "networkChangeEvents.xml"
-
-
-networkChangeEventsTree = ET.ElementTree(networkChangeEvents)
-networkChangeEventsTree.write(networkChangeEventsFile)
-with open(networkChangeEventsFile, 'r+') as f:
-    content = f.read()
-    f.seek(0, 0)
-    f.write(header1 + '\n')
-    f.write(content)
+networkChangeEvents = NetworkChangeEvents()
+networkChangeEvents.generateNetworkChangeEvents("flooding.txt")
+networkChangeEvents.writeTreeToFile("networkChangeEvents.xml")
