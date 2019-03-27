@@ -13,7 +13,7 @@
 	</module>
 	<!-- ====================================================================== -->
 	<module name="plans" >
-		<param name="inputPlansFile" value="sampleplansgenerated.xml" />
+		<param name="inputPlansFile" value="generatedplans.xml" />
 	</module>
 	<!-- ====================================================================== -->
 	<module name="qsim" >

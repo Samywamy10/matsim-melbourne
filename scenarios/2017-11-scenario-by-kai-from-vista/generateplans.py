@@ -1,69 +1,184 @@
 import sys
 
-number_of_plans = int(sys.argv[1])
+populationSize = int(sys.argv[1])
 from dateutil import parser
 from datetime import timedelta
 import xml.etree.ElementTree as ET
 import math
 import random
-network = ET.parse('net2.xml')
-root = network.getroot()
-min_x = math.inf
-min_y = math.inf
-max_x = -math.inf
-max_y = -math.inf
-for child in root.iter('node'):
-    min_x = min(float(child.attrib['x']),min_x)
-    min_y = min(float(child.attrib['y']),min_y)
-    max_x = max(float(child.attrib['x']),max_x)
-    max_y = max(float(child.attrib['y']),max_y)
 
-margin_of_error = 200
-min_x += margin_of_error
-min_y += margin_of_error
-max_x -= margin_of_error
-max_y -= margin_of_error
+class Coordinate:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
 
-population = ET.Element('population')
+class Shape:
+    def __init__(self):
+        self.min = Coordinate(math.inf,math.inf)
+        self.max = Coordinate(-math.inf,-math.inf)
 
-for person in range(number_of_plans):
-    current_person = ET.SubElement(population,'person')
-    current_person.set('id',str(random.randint(1000000000,9999999999)))
-    current_plan = ET.SubElement(current_person,'plan')
-    current_plan.set('selected','yes')
+    def getRandomPosition(self):
+        return Coordinate(random.uniform(self.min.x, self.max.x), random.uniform(self.min.y, self.max.y))
 
-    start_activity = ET.SubElement(current_plan,'activity')
-    start_activity.set('type','At Home')
-    start_x = random.uniform(min_x, max_x)
-    start_y = random.uniform(min_y, max_y)
-    start_activity.set('x',str(start_x))
-    start_activity.set('y',str(start_y))
-    start_activity.set('end_time', '01:00:00')
+def getClosestRegion(startCoordinate, regions):
+    closestDistance = math.inf
+    closestDistanceRegion = regions[0]
+    for region in regions:
+        toMinPointDistance = distanceBetweenPoints(startCoordinate, region.min)
+        toMaxPointDistance = distanceBetweenPoints(startCoordinate, region.max)
+        if toMinPointDistance < closestDistance or toMaxPointDistance < closestDistance:
+            closestDistance = min(toMinPointDistance, toMaxPointDistance)
+            closestDistanceRegion = region
+    return closestDistanceRegion
 
-    leg = ET.SubElement(current_plan, 'leg')
-    leg.set('mode','car')
+def distanceBetweenPoints(coordinate1, coordinate2):
+    return math.sqrt((coordinate2.x - coordinate1.x)**2 + (coordinate2.y - coordinate1.y)**2)
 
-    end_x = random.uniform(min_x, max_x)
-    end_y = start_y
-    #we want to move people to the nearest edge except for min x
-    if abs(start_y - max_y) > abs(start_y - min_y):
-        end_y = max_y
-    else:
-        end_y = min_y
+class Polygon(Shape):
+    def __init__(self,topLeft,topRight,bottomLeft,bottomRight):
+        Shape.__init__(self)
+        self.topLeft = topLeft
+        self.topRight = topRight
+        self.bottomLeft = bottomLeft
+        self.bottomRight = bottomRight
+        self.__calculateMinAndMax()
+    
+    def __calculateMinAndMax(self):
+        #topLeft
+        self.min.x = min(self.topLeft.x, self.min.x)
+        self.max.x = max(self.topLeft.x, self.max.x)
+        self.min.y = min(self.topLeft.y, self.min.y)
+        self.max.y = max(self.topLeft.y, self.max.y)
 
-        
-    end_activity = ET.SubElement(current_plan, 'activity')
-    end_activity.set('type','Go Home')
-    end_activity.set('x',str(end_x))
-    end_activity.set('y',str(end_y))
-    end_activity.set('start_time', '01:0:00')
-    end_activity.set('end_time', '03:00:00')
+        #topRight
+        self.min.x = min(self.topRight.x, self.min.x)
+        self.max.x = max(self.topRight.x, self.max.x)
+        self.min.y = min(self.topRight.y, self.min.y)
+        self.max.y = max(self.topRight.y, self.max.y)
 
-tree = ET.ElementTree(population)
+        #bottomLeft
+        self.min.x = min(self.bottomLeft.x, self.min.x)
+        self.max.x = max(self.bottomLeft.x, self.max.x)
+        self.min.y = min(self.bottomLeft.y, self.min.y)
+        self.max.y = max(self.bottomLeft.y, self.max.y)
+
+        #bottomRight
+        self.min.x = min(self.bottomRight.x, self.min.x)
+        self.max.x = max(self.bottomRight.x, self.max.x)
+        self.min.y = min(self.bottomRight.y, self.min.y)
+        self.max.y = max(self.bottomRight.y, self.max.y)
+
+class Network(Shape):
+    def __init__(self, networkXml):
+        Shape.__init__(self)
+        self.networkXml = networkXml
+        self.__initNetwork()
+        self.__calculateMinAndMax()
+    
+    def __initNetwork(self):
+        self.root = self.networkXml.getroot()
+
+    def __calculateMinAndMax(self):
+        for child in self.root.iter('node'):
+            self.min.x = min(float(child.attrib['x']),self.min.x)
+            self.min.y = min(float(child.attrib['y']),self.min.y)
+            self.max.x = max(float(child.attrib['x']),self.max.x)
+            self.max.y = max(float(child.attrib['y']),self.max.y)
+
+class XmlElement:
+    def __init__(self, elementName):
+        self.xmlElement = ET.Element(elementName)
+    
+    def getXml(self):
+        return self.xmlElement
+
+    def addSubElement(self, subElement):
+        self.xmlElement.append(subElement)
+
+class Population(XmlElement):
+    def __init__(self):
+        XmlElement.__init__(self,'population')
+    
+    def generatePopulation(self, populationSize, startRegion, endRegions):
+        for personNumber in range(populationSize):
+            person = Person(personNumber, self.xmlElement)
+            plan = Plan()
+            startCoordinate = startRegion.getRandomPosition()
+            startActivity = Activity('At Home', startCoordinate, '01:00:00')
+            plan.addActivity(startActivity)
+            plan.addActivity(Leg('car'))
+            endActivity = Activity('Go Home', getClosestRegion(startCoordinate, endRegions).getRandomPosition(), '03:00:00')
+            plan.addActivity(endActivity)
+            person.addPlan(plan)
+            self.addPerson(person)
+
+    def getTree(self):
+        return ET.ElementTree(self.xmlElement)
+
+    def addPerson(self, person):
+        self.addSubElement(person.xmlElement)
+
+class Person(XmlElement):
+    def __init__(self, internalId, populationXml):
+        XmlElement.__init__(self, 'person')
+        self.__generateId()
+        self.xmlElement.set('id',self.id)
+        self.internalId = internalId
+    
+    def __generateId(self):
+        self.id = str(random.randint(1000000000,9999999999))
+
+    def addPlan(self, plan):
+        self.addSubElement(plan.xmlElement)
+
+class Plan(XmlElement):
+    def __init__(self, selected = True):
+        XmlElement.__init__(self, 'plan')
+        if selected:
+            self.xmlElement.set('selected','yes')
+        else:
+            self.xmlElement.set('selected','no')
+
+    def addActivity(self, activity):
+        self.addSubElement(activity.xmlElement)
+    
+    def addLeg(self, leg):
+        self.addSubElement(leg.xmlElement)
+
+class Activity(XmlElement):
+    def __init__(self, typeName, coordinate, endTime):
+        XmlElement.__init__(self, 'activity')
+        self.xmlElement.set('type', typeName)
+        self.xmlElement.set('x', str(coordinate.x))
+        self.xmlElement.set('y', str(coordinate.y))
+        self.xmlElement.set('end_time', endTime)
+
+class Leg(XmlElement):
+    def __init__(self, modeName):
+        XmlElement.__init__(self, 'leg')
+        self.xmlElement.set('mode',modeName)            
+
+
+
+#safe zone above creek
+above_creek = Polygon(Coordinate(1.614234761040829E7,-4560734.749976564), Coordinate(1.6143367207888365E7,-4560898.8048608275), Coordinate(1.6142285026590563E7, -4561169.767607265), Coordinate(1.614330436803581E7,-4561331.897382162))
+
+#safe zone below creek
+below_creek = Polygon(Coordinate(1.6143313774532782E7,-4566525.3373900475), Coordinate(1.6144027621899443E7,-4566781.843705078), Coordinate(1.6143215668665543E7,-4567264.97602887),Coordinate(1.6143947816956492E7,-4567382.626620158))
+
+
+
+
+network = Network(ET.parse('net2.xml'))
+population = Population()
+population.generatePopulation(populationSize, network, [below_creek,above_creek])
+
+
+tree = population.getTree()
 header1 = '<?xml version="1.0" encoding="utf-8"?>'
 header2 = '<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">'
 
-filename = "sampleplansgenerated.xml"
+filename = "generatedplans.xml"
 
 tree.write(filename)
 
@@ -80,7 +195,7 @@ networkChangeEvents.set('xsi:schemaLocation','http://www.matsim.org/files/dtd ht
 
 
 #major flooding
-startTime = '01:01:00'
+startTime = '01:00:01'
 def addToTime(currentTime, addSeconds):
     currentTime = parser.parse(currentTime) + timedelta(seconds=addSeconds)
     return currentTime.strftime("%H:%M:%S")
@@ -95,7 +210,7 @@ with open("flooding.txt", 'r') as majorFloodingFile:
                 freespeed.set('value','0.00000001') #value of 0 causes errors
             networkChangeEvent = ET.SubElement(networkChangeEvents,'networkChangeEvent')
             networkChangeEvent.set('startTime',startTime)
-            startTime = addToTime(startTime,30)
+            startTime = addToTime(startTime,1)
             current += 1
         else:
             Id = line.strip()
